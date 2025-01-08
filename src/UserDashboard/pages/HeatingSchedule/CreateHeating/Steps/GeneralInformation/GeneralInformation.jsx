@@ -36,7 +36,7 @@ function GeneralInformation({
               onBlur={checkName}
               sizing="sm"
               placeholder="Namen eingeben"
-              className="w-[250px] text-sm"
+              className="w-[250px]"
               onChange={handleChange}
               required
               color={errorMessages.programName ? "failure" : undefined}
@@ -57,7 +57,7 @@ function GeneralInformation({
               <Label
                 className=" text-sm text-gray-900"
                 htmlFor="child-safety"
-                value="Kindersicherung"
+                value="Kindersicherung "
               />
             </div>
             <div className="flex items-center gap-2">
@@ -181,6 +181,65 @@ function GeneralInformation({
               </div>
             </>
           )}
+
+          {/* Apply algorithm? */}
+          {/* <div>
+						<div className="mb-2 flex items-center gap-2">
+							<Label
+								className=" text-sm text-gray-900"
+								htmlFor="apply-algorithm"
+								value="Algorithmus aktivieren"
+							/>
+							<Tooltip
+								className="px-3 py-1.5 text-center max-w-96"
+								content="Der Algorithmus passt dynamisch den Heizplan an."
+								style="light"
+							>
+								<IoInformationCircleOutline color="#6B7280" />
+							</Tooltip>
+						</div>
+						<div className="flex items-center gap-2">
+							<div className="flex items-center gap-2">
+								<div className="flex items-center gap-2">
+									<Radio
+										id="applyAlgorithmYes"
+										name="applyAlgorithm"
+										value="Yes"
+										onChange={handleChange}
+										required
+										checked={formData.applyAlgorithm === "Yes"}
+									/>
+									<Label
+										className="text-sm text-gray-900"
+										htmlFor="applyAlgorithmYes"
+									>
+										Ja
+									</Label>
+								</div>
+								<div className="flex items-center gap-2">
+									<Radio
+										id="applyAlgorithmNo"
+										name="applyAlgorithm"
+										value="No"
+										onChange={handleChange}
+										required
+										checked={formData.applyAlgorithm === "No"}
+									/>
+									<Label
+										className="text-sm text-gray-900"
+										htmlFor="applyAlgorithmNo"
+									>
+										Nein
+									</Label>
+								</div>
+							</div>
+						</div>
+						{errorMessages.applyAlgorithm && (
+							<div className="text-red-600 text-sm mt-1">
+								{errorMessages.applyAlgorithm}
+							</div>
+						)}
+					</div> */}
         </div>
       </form>
     </div>

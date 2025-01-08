@@ -36,6 +36,7 @@ function HeatingScheduleTableStatic({ locationDetails, props }) {
     }
     return hours * 4 + minutes / 15;
   };
+  console.log("hanging", locationDetails);
 
   // Convert the times in the data
   locationDetails = locationDetails.days.map((item) => ({
@@ -181,13 +182,19 @@ function HeatingScheduleTableStatic({ locationDetails, props }) {
         props?.noHeading ? "w-[98%]" : "w-full"
       } px-2`}
     >
+      {/* {!props?.noHeading && (
+				<h3 className="text-[16px] text-gray-500 font-semibold">
+					Heating Schedule
+				</h3>
+			)} */}
+
       <div className="">
         <div
           style={{
             display: "flex",
             justifyContent: "flex-start",
             gap: "12px",
-            marginLeft: "50px",
+            marginLeft: "60px",
             alignItems: "center",
             marginBottom: "10px",
             zIndex: "1000",
@@ -203,7 +210,7 @@ function HeatingScheduleTableStatic({ locationDetails, props }) {
                 margin: "0",
               }}
             >
-              <div className="text-[#0BAAC9] bg-[#E7F9FD] w-full font-medium rounded-lg text-xs py-2 me-2 mb-2 border border-[#0BAAC9] flex items-center justify-center ">
+              <div className="text-[#0BAAC9] bg-[#E7F9FD] w-full font-medium rounded-lg text-xs px-3 py-2 me-2 mb-2 border border-[#0BAAC9] flex items-center justify-between ">
                 {day}
               </div>
             </div>
@@ -229,7 +236,7 @@ function HeatingScheduleTableStatic({ locationDetails, props }) {
             <div
               className="absolute top-[1px] left-0 bottom-0 right-0 w-full h-full flex flex-col"
               style={{
-                gap: `${rowHeight}px`,
+                gap: `${rowHeight}px`, // Use rowHeight to match the height of labels
                 zIndex: "10",
               }}
             >
@@ -249,8 +256,6 @@ function HeatingScheduleTableStatic({ locationDetails, props }) {
                   margin: "0 ",
                   position: "relative",
                   zIndex: "10",
-                  marginLeft:"-8px",
-                  marginRight:"8px"
                 }}
               >
                 <GridLayout

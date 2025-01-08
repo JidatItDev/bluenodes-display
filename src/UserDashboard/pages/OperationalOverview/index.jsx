@@ -3,21 +3,186 @@ import OverviewCard from "./components/OverviewCard";
 import { Spinner } from "flowbite-react";
 import axios from "axios";
 import ApiUrls from "../../../globals/apiURL.js";
+import { useToast } from "./components/ToastContext.jsx";
+
+const placeholderData = [
+  {
+    id: 1,
+    name: "Gebäude A",
+    description: "Bürogebäude mit 5 Etagen",
+    status: "aktiv",
+    numberOfDevices: 20,
+    numberOfDevicesOnline: 18,
+    numberOfRooms: 34,
+    assignedNumberOfRooms: 34,
+    numberOfFloors: 3,
+    children: [
+      {
+        id: 1,
+        name: "Stockwerk 1",
+        numberOfRooms: 4,
+        assignedNumberOfRooms: 2,
+      },
+      {
+        id: 2,
+        name: "Stockwerk 2",
+        numberOfRooms: 4,
+        assignedNumberOfRooms: 3,
+      },
+      {
+        id: 3,
+        name: "Stockwerk 3",
+        numberOfRooms: 2,
+        assignedNumberOfRooms: 1,
+      },
+    ],
+  },
+
+  {
+    id: 2,
+    name: "Gebäude B",
+    description: "Lagerhalle mit 2 Etagen",
+    status: "inaktiv",
+    numberOfDevices: 20,
+    numberOfDevicesOnline: 12,
+    numberOfRooms: 100,
+    assignedNumberOfRooms: 50,
+    numberOfFloors: 3,
+    children: [
+      {
+        id: 1,
+        name: "Stockwerk 1",
+        numberOfRooms: 4,
+        assignedNumberOfRooms: 2,
+      },
+      {
+        id: 2,
+        name: "Stockwerk 2",
+        numberOfRooms: 4,
+        assignedNumberOfRooms: 3,
+      },
+      {
+        id: 3,
+        name: "Stockwerk 3",
+        numberOfRooms: 2,
+        assignedNumberOfRooms: 1,
+      },
+    ],
+  },
+
+  {
+    id: 3,
+    name: "Gebäude C",
+    description: "Wohngebäude mit 3 Etagen",
+    status: "aktiv",
+    numberOfDevices: 20,
+    numberOfDevicesOnline: 18,
+    numberOfRooms: 39,
+    assignedNumberOfRooms: 34,
+    numberOfFloors: 3,
+    children: [
+      {
+        id: 1,
+        name: "Stockwerk 1",
+        numberOfRooms: 4,
+        assignedNumberOfRooms: 2,
+      },
+      {
+        id: 2,
+        name: "Stockwerk 2",
+        numberOfRooms: 4,
+        assignedNumberOfRooms: 3,
+      },
+      {
+        id: 3,
+        name: "Stockwerk 3",
+        numberOfRooms: 2,
+        assignedNumberOfRooms: 1,
+      },
+    ],
+  },
+  {
+    id: 4,
+    name: "Gebäude D",
+    description: "Fabrikgebäude mit 4 Etagen",
+    status: "inaktiv",
+    numberOfDevices: 20,
+    numberOfDevicesOnline: 18,
+    numberOfRooms: 34,
+    assignedNumberOfRooms: 4,
+    numberOfFloors: 3,
+    children: [
+      {
+        id: 1,
+        name: "Stockwerk 1",
+        numberOfRooms: 4,
+        assignedNumberOfRooms: 2,
+      },
+      {
+        id: 2,
+        name: "Stockwerk 2",
+        numberOfRooms: 4,
+        assignedNumberOfRooms: 3,
+      },
+      {
+        id: 3,
+        name: "Stockwerk 3",
+        numberOfRooms: 2,
+        assignedNumberOfRooms: 1,
+      },
+    ],
+  },
+  {
+    id: 5,
+    name: "Gebäude E",
+    description: "Kundendienstbüro mit 2 Etagen",
+    status: "aktiv",
+    numberOfDevices: 20,
+    numberOfDevicesOnline: 18,
+    numberOfRooms: 34,
+    assignedNumberOfRooms: 30,
+    numberOfFloors: 3,
+    children: [
+      {
+        id: 1,
+        name: "Stockwerk 1",
+        numberOfRooms: 4,
+        assignedNumberOfRooms: 2,
+      },
+      {
+        id: 2,
+        name: "Stockwerk 2",
+        numberOfRooms: 4,
+        assignedNumberOfRooms: 3,
+      },
+      {
+        id: 3,
+        name: "Stockwerk 3",
+        numberOfRooms: 2,
+        assignedNumberOfRooms: 1,
+      },
+    ],
+  },
+];
 
 function OverviewPage() {
   const [data, setData] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [Loader, setLoader] = useState(true);
+  const { showToast } = useToast();
 
   const fetchAll = () => {
-    axios
-      .get(ApiUrls.SMARTHEATING_OPERATIONALVIEW.LIST)
-      .then((response) => response.data)
-      .then((data) => {
-        setData(data);
-        setLoader(false);
-      })
-      .catch((error) => console.error("Error:", error));
+    // axios
+    //   .get(ApiUrls.SMARTHEATING_OPERATIONALVIEW.LIST)
+    //   .then((response) => response.data)
+    //   .then((data) => {
+    //     setData(data);
+    //     setLoader(false);
+    //   })
+    //   .catch((error) => console.error("Error:", error));
+
+    setData(placeholderData);
+    setLoader(false);
   };
 
   useEffect(() => {
@@ -31,7 +196,7 @@ function OverviewPage() {
   return (
     <>
       <div className="flex flex-col gap-6 ">
-        <h2 className="text-[24px] text-gray-900">Betriebsübersicht</h2>
+        <h2 className="text-[24px] text-gray-900">Betriebsübersicht </h2>
         <div className="flex items-center justify-between ">
           <div className="flex items-center gap-4 ">
             <form className="w-[380px] ">
@@ -70,6 +235,10 @@ function OverviewPage() {
                 />
               </div>
             </form>
+            {/* <div className=" flex items-center justify-center gap-1.5 text-[#6B7280] cursor-pointer">
+							<FaFilter />
+							<p className="text-sm ">Filter</p>
+						</div> */}
           </div>
         </div>
         {Loader && (

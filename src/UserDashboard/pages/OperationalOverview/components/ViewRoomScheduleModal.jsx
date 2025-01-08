@@ -28,17 +28,112 @@ export function ViewRoomScheduleModal({
   };
 
   useEffect(() => {
-    if (heatingScheduleId) {
-      setloading(true);
-      axios
-        .get(ApiUrls.SMARTHEATING_HEATINGSCHEDULE.DETAILS(heatingScheduleId))
+    console.log("erorr here");
 
-        .then((response) => response.data)
-        .then((data) => {
-          setLocationDetails(data);
-        })
-        .catch((error) => console.error("Error:", error))
-        .finally(() => setloading(false)); // Corrected here
+    if (heatingScheduleId !== null) {
+      setloading(true);
+      // axios
+      //   .get(ApiUrls.SMARTHEATING_HEATINGSCHEDULE.DETAILS(heatingScheduleId))
+
+      //   .then((response) => response.data)
+      //   .then((data) => {
+      //     setLocationDetails(data);
+      //   })
+      //   .catch((error) => console.error("Error:", error))
+      //   .finally(() => setloading(false)); // Corrected here
+
+      setLocationDetails({
+        assignedRooms: [
+          {
+            id: "building1",
+            name: "Gebäude 1",
+            children: [
+              {
+                id: "floor1",
+                name: "Etage 1",
+                children: [
+                  { id: "room1", name: "Raum 1" },
+                  { id: "room2", name: "Raum 2" },
+                ],
+              },
+              {
+                id: "floor2",
+                name: "Etage 2",
+                children: [
+                  { id: "room3", name: "Raum 3" },
+                  { id: "room4", name: "Raum 4" },
+                ],
+              },
+            ],
+          },
+          {
+            id: "building2",
+            name: "Gebäude 2",
+            children: [
+              {
+                id: "floor3",
+                name: "Etage 1",
+                children: [
+                  { id: "room5", name: "Raum 5" },
+                  { id: "room6", name: "Raum 6" },
+                ],
+              },
+            ],
+          },
+        ],
+        days: [
+          {
+            day: 1, // Monday
+            from: "08:00:00",
+            to: "12:00:00",
+            targetTemperature: 20,
+          },
+          {
+            day: 1, // Monday
+            from: "14:00:00",
+            to: "18:00:00",
+            targetTemperature: 22,
+          },
+          {
+            day: 2, // Tuesday
+            from: "09:00:00",
+            to: "17:00:00",
+            targetTemperature: 21,
+          },
+          {
+            day: 3, // Wednesday
+            from: "10:00:00",
+            to: "15:00:00",
+            targetTemperature: 19,
+          },
+          {
+            day: 4, // Thursday
+            from: "07:00:00",
+            to: "11:00:00",
+            targetTemperature: 18,
+          },
+          {
+            day: 5, // Friday
+            from: "08:30:00",
+            to: "16:30:00",
+            targetTemperature: 20,
+          },
+          {
+            day: 6, // Saturday
+            from: "10:00:00",
+            to: "14:00:00",
+            targetTemperature: 22,
+          },
+          {
+            day: 7, // Sunday
+            from: "12:00:00",
+            to: "18:00:00",
+            targetTemperature: 24,
+          },
+        ],
+      });
+
+      setloading(false);
     }
   }, [heatingScheduleId]);
 
@@ -63,9 +158,7 @@ export function ViewRoomScheduleModal({
                 {!isChecked ? (
                   <div className="max-h-[400px] overflow-y-auto overflow-x-hidden pr-2">
                     {locationDetails && (
-                      <HeatingScheduleTable
-                        locationDetails={locationDetails}
-                      />
+                      <HeatingScheduleTable locationDetails={locationDetails} />
                     )}
                   </div>
                 ) : (

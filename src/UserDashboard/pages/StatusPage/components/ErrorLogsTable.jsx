@@ -18,7 +18,7 @@ import { IoIosWarning } from "react-icons/io";
 import { CiCircleRemove } from "react-icons/ci";
 import SkeletonErrorTable from "./ErrorsSkelton";
 
-const ErrorLogsTable = () => {
+const ErrorLogsTable = ({ placeholdertableData }) => {
   const [selectedEventFilters, setSelectedEventFilters] = useState([
     // { name: "Error", code: "err", germanLabel: "Fehler" },
     // { name: "Warning", code: "warn", germanLabel: "Warnung" },
@@ -136,25 +136,17 @@ const ErrorLogsTable = () => {
   //   if (filtersSelected === false) getAllLocations();
   // }, [filtersSelected]);
 
-  const getAllLocations = () => {
-    axios
-      .get(ApiUrls.SMARTHEATING_LOCATIONS.LIST)
-      .then((response) => {
-        const transformedData = transformData(response.data);
-        setFilteredLocations(transformedData);
-        setLocationsData(transformedData);
-
-        const extractedFloors = transformedData
-          .map((location) => location.children)
-          .flat();
-        // Update the floors state with the extracted children
-        setFloors(extractedFloors);
-      })
-      .catch((error) => {
-        console.log("Error fetching locations:", error);
-      });
-  };
-
+  // useEffect(() => {
+  //   if (filtersSelected === false) getAllLocations();
+  // }, [filtersSelected]);
+  const [tableData, setTableData] = useState(placeholdertableData);
+  // const [selectedFilter, setSelectedFilter] = useState("Last Year");
+  // const [selectedEvent, setSelectedEvent] = useState("All events");
+  // useEffect(() => {
+  //   if (selectedEventFilters !== null) {
+  //     getData(ApiLocationsToBeSend);
+  //   }
+  // }, [selectedEventFilters]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalRows, setTotalRows] = useState(0);
   const [selectedKeys, setSelectedKeys] = useState({});
@@ -291,7 +283,7 @@ const ErrorLogsTable = () => {
     } else {
       setSelectedLocationFilter(0);
       setFiltersSelected(false);
-      getData();
+      // getData();
     }
   };
 
@@ -348,8 +340,8 @@ const ErrorLogsTable = () => {
   //   }
   // };
 
-  // const [dateTo, setdateTo] = useState(null);
-  // const [dateFrom, setdateFrom] = useState(null);
+  const [dateTo, setdateTo] = useState(null);
+  const [dateFrom, setdateFrom] = useState(null);
 
   // useEffect(() => {
   //   getData(ApiLocationsToBeSend);
@@ -361,69 +353,6 @@ const ErrorLogsTable = () => {
   //   currentPage,
   // ]);
 
-  const [delayedLoading, setDelayedLoading] = useState(false);
-  useEffect(() => {
-    if (loading) {
-      const timer = setTimeout(() => setDelayedLoading(true), 400);
-
-      return () => clearTimeout(timer);
-    } else {
-      setDelayedLoading(false);
-    }
-  }, [loading]);
-  const getData = (locations) => {
-    const eventTypeLevel =
-      (selectedEventFilters !== null &&
-        selectedEventFilters.map((filter) => filter.name).join(",")) ||
-      null;
-
-    fetchErrorLogsData(
-      currentPage,
-      itemsPerPage,
-      locations,
-      eventTypeLevel,
-      dateTo,
-      dateFrom
-    )
-      .then((data) => {
-        const filteredData = data.rows.filter(
-          (item) =>
-            item.eventTypeLevel !== "Information" &&
-            item.eventTypeLevel !== "Behoben"
-        );
-
-        setTotalRows(filteredData.length);
-        setTableData(filteredData);
-        setLoading(false);
-      })
-      .catch((error) => {
-        setLoading(false);
-        console.log("Error fetching event logs:", error);
-      });
-  };
-  const [dateTo, setdateTo] = useState(null);
-  const [dateFrom, setdateFrom] = useState(null);
-
-  useEffect(() => {
-    getData(ApiLocationsToBeSend);
-  }, [
-    ApiLocationsToBeSend,
-    apiLocationsToBeSendCounter,
-    selectedEventFilters,
-    dateTo,
-    dateFrom,
-    currentPage,
-  ]);
-  useEffect(() => {
-    if (!filtersSelected) getAllLocations();
-  }, [filtersSelected]);
-
-  const [tableData, setTableData] = useState([]);
-  // useEffect(() => {
-  //   if (selectedEventFilters !== null) {
-  //     getData(ApiLocationsToBeSend);
-  //   }
-  // }, [selectedEventFilters]);
   const itemsPerPage = 10;
   const totalItems = totalRows && totalRows;
   const totalPages = Math.ceil(totalItems / itemsPerPage);
@@ -652,8 +581,8 @@ const ErrorLogsTable = () => {
               </th>
             </tr>
           </thead>
-          {delayedLoading && <SkeletonErrorTable />}
-          {tableData.length > 0 && !delayedLoading && (
+          {/* {delayedLoading && <SkeletonErrorTable />} */}
+          {tableData.length > 0 && (
             <tbody>
               {tableData.map((item, index) => (
                 <tr

@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable react/prop-types */
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Checkbox,
@@ -9,8 +11,150 @@ import {
 } from "flowbite-react";
 import { customTableTheme } from "./AssignmentAccordionTheme";
 import { FaCheck, FaCircleCheck } from "react-icons/fa6";
+import { errorMessages } from "../../../../../../globals/errorMessages";
 import _ from "lodash";
 import { IoArrowBackCircle } from "react-icons/io5";
+
+const apiData = {
+  buildings: [
+    {
+      id: 1,
+      name: "Building A",
+      roomsAssigned: 10,
+      totalRooms: 15,
+      floors: [
+        {
+          id: 1,
+          name: "Floor 1",
+          roomsAssigned: 5,
+          totalRooms: 7,
+          rooms: [
+            {
+              id: 1,
+              name: "Room 101",
+              type: "Office",
+              algorithmOn: false,
+              programAssigned: "Heating Plan A",
+              currentTemperature: 22.5,
+              assigned: true,
+            },
+            {
+              id: 2,
+              name: "Room 102",
+              type: "Meeting",
+              algorithmOn: false,
+              programAssigned: "Heating Plan B",
+              currentTemperature: 21.3,
+              assigned: false,
+            },
+            {
+              id: 3,
+              name: "Room 103",
+              type: "Office",
+              algorithmOn: false,
+              programAssigned: "Heating Plan A",
+              currentTemperature: 20.7,
+              assigned: true,
+            },
+            // More rooms...
+          ],
+        },
+        {
+          id: 2,
+          name: "Floor 2",
+          roomsAssigned: 6,
+          totalRooms: 8,
+          rooms: [
+            {
+              id: 4,
+              name: "Room 201",
+              type: "Office",
+              algorithmOn: false,
+              programAssigned: "Heating Plan C",
+              currentTemperature: 19.8,
+              assigned: false,
+            },
+            {
+              id: 5,
+              name: "Room 202",
+              type: "Storage",
+              algorithmOn: false,
+              programAssigned: "Heating Plan B",
+              currentTemperature: 18.7,
+              assigned: true,
+            },
+            // More rooms...
+          ],
+        },
+        // More floors...
+      ],
+    },
+    {
+      id: 2,
+      name: "Building B",
+      roomsAssigned: 12,
+      totalRooms: 18,
+      floors: [
+        {
+          id: 1,
+          name: "Floor 1",
+          roomsAssigned: 6,
+          totalRooms: 9,
+          rooms: [
+            {
+              id: 6,
+              name: "Room 101",
+              type: "Office",
+              algorithmOn: false,
+              programAssigned: "Heating Plan A",
+              currentTemperature: 22.0,
+              assigned: true,
+            },
+            {
+              id: 7,
+              name: "Room 102",
+              type: "Meeting",
+              algorithmOn: false,
+              programAssigned: "Heating Plan C",
+              currentTemperature: 20.5,
+              assigned: false,
+            },
+            // More rooms...
+          ],
+        },
+        {
+          id: 2,
+          name: "Floor 2",
+          roomsAssigned: 6,
+          totalRooms: 9,
+          rooms: [
+            {
+              id: 8,
+              name: "Room 201",
+              type: "Laboratory",
+              algorithmOn: true,
+              programAssigned: "Heating Plan D",
+              currentTemperature: 21.0,
+              assigned: true,
+            },
+            {
+              id: 9,
+              name: "Room 202",
+              type: "Meeting",
+              algorithmOn: false,
+              programAssigned: "Heating Plan A",
+              currentTemperature: 19.9,
+              assigned: false,
+            },
+            // More rooms...
+          ],
+        },
+        // More floors...
+      ],
+    },
+    // More buildings...
+  ],
+};
 
 const ProgramAssignment = ({
   formData,
@@ -22,16 +166,7 @@ const ProgramAssignment = ({
   clone,
   program,
 }) => {
-  const [data, setData] = useState(
-    heatingData && Object.keys(heatingData).length > 0
-      ? heatingData
-      : _.cloneDeep(initialData)
-  );
-  const [firstData, setFirstData] = useState(
-    heatingData && Object.keys(heatingData).length > 0
-      ? heatingData
-      : _.cloneDeep(initialData)
-  );
+  const [data, setData] = useState(apiData);
   const [filter, setFilter] = useState("All");
 
   // Function to create a mapping of room IDs to their default values
@@ -109,7 +244,7 @@ const ProgramAssignment = ({
   };
 
   useEffect(() => {
-    const newData = _.cloneDeep(data);
+    const newData = _.cloneDeep(apiData);
 
     newData.buildings.forEach((building) => {
       building.floors.forEach((floor) => {
@@ -131,98 +266,37 @@ const ProgramAssignment = ({
     setData(newData);
   }, []);
 
-  // const handleSelectAllRooms = (buildingId, floorId, isSelected) => {
-  //   const newData = _.cloneDeep(firstData);
-  //   const building = newData.buildings.find((b) => b.id === buildingId);
-  //   const floor = building.floors.find((f) => f.id === floorId);
-  //   let count = floor.roomsAssigned;
-  //   let newVar = 0;
-
-  //   floor.rooms.forEach((room) => {
-  //     room.assigned = isSelected;
-  //     if (isSelected) {
-  //       room.programAssigned = formData.programName;
-  //       room.algorithmOn = formData.applyAlgorithm;
-  //     } else {
-  //       const defaultValues = defaultValuesMap[room.id];
-  //       room.programAssigned =
-  //         defaultValues.programAssigned === formData.programName
-  //           ? ""
-  //           : defaultValues.programAssigned;
-  //       room.algorithmOn = defaultValues.algorithmOn;
-  //       // room.assigned = defaultValues.assigned;
-  //       if (defaultValues.programAssigned === formData.programName) {
-  //         count = count - 1;
-  //       }
-  //     }
-  //   });
-
-  //   const previouslyAssigned = floor.roomsAssigned;
-
-  //   const newlyAssigned = isSelected ? floor.totalRooms : count > 0 ? count : 0;
-  //   floor.roomsAssigned = newlyAssigned;
-
-  //   // Update building assigned count
-  //   const difference = newlyAssigned - previouslyAssigned;
-  //   building.roomsAssigned += difference;
-  //   setData(newData);
-  // };
-
   const handleSelectAllRooms = (buildingId, floorId, isSelected) => {
-    const newData = _.cloneDeep(firstData); // Generate newData as before
-    const buildingInNewData = newData.buildings.find(
-      (b) => b.id === buildingId
-    );
-    const floorInNewData = buildingInNewData.floors.find(
-      (f) => f.id === floorId
-    );
+    const newData = _.cloneDeep(apiData);
+    const building = newData.buildings.find((b) => b.id === buildingId);
+    const floor = building.floors.find((f) => f.id === floorId);
+    let newVar = 0;
 
-    // Make a clone of current data to avoid full replacement
-    const updatedData = _.cloneDeep(data);
-    const buildingInData = updatedData.buildings.find(
-      (b) => b.id === buildingId
-    );
-    const floorInData = buildingInData.floors.find((f) => f.id === floorId);
-
-    let count = floorInNewData.roomsAssigned;
-
-    floorInNewData.rooms.forEach((newRoom) => {
-      const roomInData = floorInData.rooms.find(
-        (room) => room.id === newRoom.id
-      );
-
-      roomInData.assigned = isSelected;
-
+    floor.rooms.forEach((room) => {
+      room.assigned = isSelected;
       if (isSelected) {
-        roomInData.programAssigned = formData.programName;
-        roomInData.algorithmOn = formData.applyAlgorithm;
+        room.programAssigned = formData.programName;
+        room.algorithmOn = formData.applyAlgorithm;
+        room.assigned = true;
       } else {
-        const defaultValues = defaultValuesMap[newRoom.id];
-
-        roomInData.programAssigned =
-          defaultValues.programAssigned === formData.programName
-            ? ""
-            : defaultValues.programAssigned;
-        roomInData.algorithmOn = defaultValues.algorithmOn;
-
-        if (defaultValues.programAssigned === formData.programName) {
-          count -= 1;
-        }
+        const defaultValues = defaultValuesMap[room.id];
+        room.programAssigned = defaultValues.programAssigned;
+        room.algorithmOn = defaultValues.algorithmOn;
+        room.assigned = defaultValues.assigned;
       }
     });
 
-    const previouslyAssigned = floorInData.roomsAssigned;
-    const newlyAssigned = isSelected
-      ? floorInNewData.totalRooms
-      : count > 0
-      ? count
-      : 0;
-    floorInData.roomsAssigned = newlyAssigned;
-
+    // Update rooms assigned count
+    const previouslyAssigned = floor.roomsAssigned;
+    const newlyAssigned = isSelected ? floor.totalRooms : 0;
     const difference = newlyAssigned - previouslyAssigned;
-    buildingInData.roomsAssigned += difference;
+    floor.roomsAssigned = newlyAssigned;
+    building.roomsAssigned += difference;
 
-    setData(updatedData); // Only set the updated parts of data
+    // floor.roomsAssigned = isSelected ? floor.totalRooms : floor.rooms.filter(room => room.assigned).length;
+    // building.roomsAssigned = newData.buildings.reduce((acc, b) => acc + b.floors.reduce((acc, f) => acc + f.roomsAssigned, 0), 0);
+
+    setData(newData);
   };
 
   const isAllRoomsSelected = (floor) => {
@@ -246,9 +320,9 @@ const ProgramAssignment = ({
     }
   };
 
-  useEffect(() => {
-    assignmentData(data);
-  }, [data]);
+  // useEffect(() => {
+  //   assignmentData(data);
+  // }, [data]);
 
   const [viewSelected, setviewSelected] = useState(false);
   const [viewAll, setViewAll] = useState(false);
@@ -274,6 +348,14 @@ const ProgramAssignment = ({
     const anyRoomSelected = data.buildings.some((building) =>
       building.floors.some((floor) => floor.rooms.some((room) => room.assigned))
     );
+
+    // if (!anyRoomSelected) {
+    //   setNoRoomsError(true);
+    //   setError(errorMessages.noRoomSelected);
+    // } else {
+    //   setError('');
+    //   // Submit the form or perform other actions
+    // }
   }, [data, setNoRoomsError, setError]); // Dependency array
 
   // Set the handleCheck function in the ref passed from the parent
@@ -282,7 +364,7 @@ const ProgramAssignment = ({
   }, [handleSubmit, setHandleAssignmentRef]);
 
   useEffect(() => {
-    const anyRoomSelected = data.buildings.some((building) =>
+    const anyRoomSelected = apiData.buildings.some((building) =>
       building.floors.some((floor) => floor.rooms.some((room) => room.assigned))
     );
     if (!anyRoomSelected) {
@@ -315,7 +397,23 @@ const ProgramAssignment = ({
           </Tooltip>
           Wählen Sie die Räume aus.
         </h3>
-
+        <div className="w-full flex justify-end">
+          {!viewAll ? (
+            <Button
+              onClick={handleViewSelected}
+              className=" hover:!bg-transparent hover:opacity-80 border-none text-primary bg-transparent pr-2 py-0 [&>*]:p-0 focus:ring-transparent"
+            >
+              View Selected
+            </Button>
+          ) : (
+            <Button
+              onClick={handleViewAll}
+              className=" hover:!bg-transparent hover:opacity-80 border-none text-primary bg-transparent pr-2 py-0 [&>*]:p-0 focus:ring-transparent"
+            >
+              View All
+            </Button>
+          )}
+        </div>
         {noRoomsError && error && (
           <div className="text-red-800 px-4 py-3 bg-[#FDF2F2] w-fit text-[16px] font-semibold flex items-center gap-2">
             <FaCircleCheck />
@@ -337,24 +435,7 @@ const ProgramAssignment = ({
             <option value="Unassigned">Nicht zugewiesen</option>
           </Select>
         </div>
-        <div className="w-fit flex justify-end">
-          {!viewAll ? (
-            <Button
-              onClick={handleViewSelected}
-              className=" hover:!bg-transparent hover:opacity-80 border-none text-primary bg-transparent pr-2 py-0 [&>*]:p-0 focus:ring-transparent"
-            >
-              Auswahl anzeigen
-            </Button>
-          ) : (
-            <Button
-              onClick={handleViewAll}
-              className=" hover:!bg-transparent hover:opacity-80 border-none text-primary bg-transparent pr-2 py-0 [&>*]:p-0 focus:ring-transparent"
-            >
-              Alle anzeigen
-            </Button>
-          )}
-        </div>
-        {/* <form
+        <form
           onSubmit={(e) => {
             e.preventDefault();
           }}
@@ -391,11 +472,14 @@ const ProgramAssignment = ({
               placeholder="Suche"
               required
             />
+            {/* <button type="submit" className="text-white absolute end-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Search</button> */}
           </div>
-        </form> */}
+        </form>
       </div>
-      <div className=" flex items-center justify-between gap-2 -mt-2">
-        <p className=" text-sm text-gray-500"></p>
+      <div className=" flex items-center justify-between gap-2">
+        <p className=" text-sm text-gray-500">
+          Select rooms to assign a heating program.
+        </p>
         <Button
           onClick={resetAssignments}
           className=" hover:!bg-transparent hover:opacity-80 border-none text-red-600 bg-transparent pr-2 py-0 [&>*]:p-0 focus:ring-transparent"
@@ -404,8 +488,8 @@ const ProgramAssignment = ({
         </Button>
       </div>
       <div className=" flex flex-col gap-0">
-        {!viewSelected
-          ? data.buildings.map((building) => (
+        {true
+          ? apiData.buildings.map((building) => (
               <Accordion className=" border-none" key={building.id} collapseAll>
                 <Accordion.Panel className="">
                   <Accordion.Title className=" p-2 mb-1 flex-row-reverse items-center justify-end gap-3 border-none hover:bg-white focus:ring-none focus:ring-white bg-white">
@@ -458,8 +542,8 @@ const ProgramAssignment = ({
                             {filterRooms(floor.rooms).length === 0 ? (
                               <p className="text-gray-500">
                                 {filter === "Selected" || filter === "Assigned"
-                                  ? "Nichts ausgewählt"
-                                  : "Alle Räume bereits zugewiesen"}
+                                  ? "No selected room on this floor"
+                                  : "All rooms selected on this floor"}
                               </p>
                             ) : (
                               <Table theme={customTableTheme} hoverable>
@@ -477,16 +561,18 @@ const ProgramAssignment = ({
                                     />
                                   </Table.HeadCell>
                                   <Table.HeadCell>Raum</Table.HeadCell>
+                                  {/* <Table.HeadCell>Algorithmus</Table.HeadCell> */}
                                   <Table.HeadCell>Heizplan</Table.HeadCell>
                                   <Table.HeadCell>
                                     Raumtemperatur
                                   </Table.HeadCell>
+                                  {/* <Table.HeadCell>Assignment</Table.HeadCell> */}
                                 </Table.Head>
                                 <Table.Body className="">
                                   {filterRooms(floor.rooms).map((room) => (
                                     <Table.Row
                                       key={room.id}
-                                      className={`border-t w-[10%] border-gray-300 ${
+                                      className={`border-t border-gray-300 ${
                                         room.assigned
                                           ? "bg-primary-200"
                                           : "bg-white"
@@ -504,14 +590,14 @@ const ProgramAssignment = ({
                                           }
                                         />
                                       </Table.Cell>
-                                      <Table.Cell className="w-[30%] whitespace-nowrap font-bold text-gray-900 dark:text-white">
+                                      <Table.Cell className="whitespace-nowrap font-bold text-gray-900 dark:text-white">
                                         {room.name}{" "}
                                         <span className=" text-xs font-normal py-0.5 px-2.5 bg-gray-100 rounded-3xl">
                                           {room.type}
                                         </span>
                                       </Table.Cell>
                                       {/* <Table.Cell className=' text-green-700 text-xl'>{room.algorithmOn ? <FaCheck/>:''}</Table.Cell> */}
-                                      <Table.Cell className="w-[40%]">
+                                      <Table.Cell>
                                         {room.programAssigned ? (
                                           <span className=" text-primary">
                                             {room.programAssigned}
@@ -520,7 +606,7 @@ const ProgramAssignment = ({
                                           "-"
                                         )}
                                       </Table.Cell>
-                                      <Table.Cell className="text-gray-900 w-[20%]">
+                                      <Table.Cell className="text-gray-900">
                                         {room?.currentTemperature?.toFixed(1)}°C
                                       </Table.Cell>
                                     </Table.Row>
@@ -595,8 +681,8 @@ const ProgramAssignment = ({
                                 <p className="text-gray-500">
                                   {filter === "Selected" ||
                                   filter === "Assigned"
-                                    ? "Nichts ausgewählt"
-                                    : "Alle Räume bereits zugewiesen"}
+                                    ? "No selected room on this floor"
+                                    : "All rooms selected on this floor"}
                                 </p>
                               ) : (
                                 <Table theme={customTableTheme} hoverable>
@@ -613,26 +699,29 @@ const ProgramAssignment = ({
                                         }
                                       />
                                     </Table.HeadCell>
-                                    <Table.HeadCell>Räume</Table.HeadCell>
-                                    <Table.HeadCell></Table.HeadCell>
+                                    <Table.HeadCell>Rooms</Table.HeadCell>
                                     <Table.HeadCell>
-                                      Aktiver Heizplan
+                                      Algorithm On?
                                     </Table.HeadCell>
                                     <Table.HeadCell>
-                                      Raumtemperatur
+                                      Program Assigned
                                     </Table.HeadCell>
+                                    <Table.HeadCell>
+                                      Current Temperature
+                                    </Table.HeadCell>
+                                    {/* <Table.HeadCell>Assignment</Table.HeadCell> */}
                                   </Table.Head>
                                   <Table.Body className="">
                                     {filterRooms(floor.rooms).map((room) => (
                                       <Table.Row
                                         key={room.id}
-                                        className={`border-t  border-gray-300 ${
+                                        className={`border-t border-gray-300 ${
                                           room.assigned
                                             ? "bg-primary-200"
                                             : "bg-white"
                                         }`}
                                       >
-                                        <Table.Cell className=" w-[10%] pl-4">
+                                        <Table.Cell className="pl-4">
                                           <Checkbox
                                             checked={room.assigned}
                                             onChange={() =>
@@ -644,16 +733,16 @@ const ProgramAssignment = ({
                                             }
                                           />
                                         </Table.Cell>
-                                        <Table.Cell className="w-[20%] whitespace-nowrap font-bold text-gray-900 dark:text-white">
+                                        <Table.Cell className="whitespace-nowrap font-bold text-gray-900 dark:text-white">
                                           {room.name}{" "}
                                           <span className=" text-xs font-normal py-0.5 px-2.5 bg-gray-100 rounded-3xl">
                                             {room.type}
                                           </span>
                                         </Table.Cell>
-                                        <Table.Cell className=" w-[20%] text-green-700 text-xl">
+                                        <Table.Cell className=" text-green-700 text-xl">
                                           {room.algorithmOn ? <FaCheck /> : ""}
                                         </Table.Cell>
-                                        <Table.Cell className="w-[40%]">
+                                        <Table.Cell>
                                           {room.programAssigned ? (
                                             <span className=" text-primary">
                                               {room.programAssigned}
@@ -662,7 +751,7 @@ const ProgramAssignment = ({
                                             "-"
                                           )}
                                         </Table.Cell>
-                                        <Table.Cell className="  w-[20%] text-gray-900">
+                                        <Table.Cell className=" text-gray-900">
                                           {room.currentTemperature}
                                         </Table.Cell>
                                       </Table.Row>

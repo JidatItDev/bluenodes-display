@@ -149,7 +149,100 @@ const OfflineTable = () => {
     if (filtersSelected === false) getAllLocations();
   }, [filtersSelected]);
 
-  const [tableData, setTableData] = useState([]);
+  const [tableData, setTableData] = useState([
+    {
+      deviceName: "Device 1",
+      deviceType: "Sensor",
+      building_floor_string: "Building A - Floor 1",
+      roomName: "Room 101",
+      lastSeen: 1672638672000, // Example timestamp
+      batteryLevel: "low",
+      status: "offline",
+    },
+    {
+      deviceName: "Device 2",
+      deviceType: "Camera",
+      building_floor_string: "Building B - Floor 2",
+      roomName: "Room 202",
+      lastSeen: 1672639672000, // Example timestamp
+      batteryLevel: "medium",
+      status: "offline",
+    },
+    {
+      deviceName: "Device 3",
+      deviceType: "Thermostat",
+      building_floor_string: "Building C - Floor 3",
+      roomName: "Room 303",
+      lastSeen: 1672640672000, // Example timestamp
+      batteryLevel: "high",
+      status: "offline",
+    },
+    {
+      deviceName: "Device 4",
+      deviceType: "Motion Sensor",
+      building_floor_string: "Building D - Floor 4",
+      roomName: "Room 404",
+      lastSeen: 1672641672000, // Example timestamp
+      batteryLevel: "low",
+      status: "offline",
+    },
+    {
+      deviceName: "Device 5",
+      deviceType: "Smoke Detector",
+      building_floor_string: "Building E - Floor 5",
+      roomName: "Room 505",
+      lastSeen: 1672642672000, // Example timestamp
+      batteryLevel: "medium",
+      status: "offline",
+    },
+    {
+      deviceName: "Device 1",
+      deviceType: "Sensor",
+      building_floor_string: "Building A - Floor 1",
+      roomName: "Room 101",
+      lastSeen: 1672638672000, // Example timestamp
+      batteryLevel: "low",
+      status: "offline",
+    },
+    {
+      deviceName: "Device 2",
+      deviceType: "Camera",
+      building_floor_string: "Building B - Floor 2",
+      roomName: "Room 202",
+      lastSeen: 1672639672000, // Example timestamp
+      batteryLevel: "medium",
+      status: "offline",
+    },
+    {
+      deviceName: "Device 3",
+      deviceType: "Thermostat",
+      building_floor_string: "Building C - Floor 3",
+      roomName: "Room 303",
+      lastSeen: 1672640672000, // Example timestamp
+      batteryLevel: "high",
+      status: "offline",
+    },
+    {
+      deviceName: "Device 4",
+      deviceType: "Motion Sensor",
+      building_floor_string: "Building D - Floor 4",
+      roomName: "Room 404",
+      lastSeen: 1672641672000, // Example timestamp
+      batteryLevel: "low",
+      status: "offline",
+    },
+    {
+      deviceName: "Device 5",
+      deviceType: "Smoke Detector",
+      building_floor_string: "Building E - Floor 5",
+      roomName: "Room 505",
+      lastSeen: 1672642672000, // Example timestamp
+      batteryLevel: "medium",
+      status: "offline",
+    },
+  ]);
+  // const [selectedFilter, setSelectedFilter] = useState('Last Year');
+  // const [selectedEvent, setSelectedEvent] = useState("All events");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalRows, setTotalRows] = useState(0);
   const itemsPerPage = 10;

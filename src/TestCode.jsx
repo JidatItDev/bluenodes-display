@@ -1,11 +1,27 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import thermometer from "../../../../assets/icons/thermometer-02.png";
 import windowicon from "../../../../assets/icons/Window.png";
+import algo from "../../../../assets/icons/algorithm.png";
 import { Button, Tooltip } from "flowbite-react";
 import { ViewRoomScheduleModal } from "./ViewRoomScheduleModal";
 import EditHeatingProgramModal from "./EditHeatingProgramModal";
 import axios from "axios";
 import ApiUrls from "../../../../globals/apiURL.js";
+import { memo } from "react";
+
+// Function to determine the background and text colors based on type
+const handleTypeColor = (type) => {
+  switch (type) {
+    case "Resident":
+      return "bg-yellow-100 text-yellow-800";
+    case "Office":
+      return "bg-primary-100 text-primary-800";
+    case "Utility":
+      return "bg-purple-100 text-purple-800";
+    default:
+      return "bg-gray-200 text-gray-900";
+  }
+};
 
 // Function to determine color based on temperature
 const handleTempColour = (temp) => {
@@ -40,6 +56,97 @@ const handleTextColour = (temp) => {
   }
 };
 
+const placeholderLocationDetails = {
+  assignedRooms: [
+    {
+      id: "building1",
+      name: "Gebäude 1",
+      children: [
+        {
+          id: "floor1",
+          name: "Etage 1",
+          children: [
+            { id: "room1", name: "Raum 1" },
+            { id: "room2", name: "Raum 2" },
+          ],
+        },
+        {
+          id: "floor2",
+          name: "Etage 2",
+          children: [
+            { id: "room3", name: "Raum 3" },
+            { id: "room4", name: "Raum 4" },
+          ],
+        },
+      ],
+    },
+    {
+      id: "building2",
+      name: "Gebäude 2",
+      children: [
+        {
+          id: "floor3",
+          name: "Etage 1",
+          children: [
+            { id: "room5", name: "Raum 5" },
+            { id: "room6", name: "Raum 6" },
+          ],
+        },
+      ],
+    },
+  ],
+  days: [
+    {
+      day: 1, // Monday
+      from: "08:00:00",
+      to: "12:00:00",
+      targetTemperature: 20,
+    },
+    {
+      day: 1, // Monday
+      from: "14:00:00",
+      to: "18:00:00",
+      targetTemperature: 22,
+    },
+    {
+      day: 2, // Tuesday
+      from: "09:00:00",
+      to: "17:00:00",
+      targetTemperature: 21,
+    },
+    {
+      day: 3, // Wednesday
+      from: "10:00:00",
+      to: "15:00:00",
+      targetTemperature: 19,
+    },
+    {
+      day: 4, // Thursday
+      from: "07:00:00",
+      to: "11:00:00",
+      targetTemperature: 18,
+    },
+    {
+      day: 5, // Friday
+      from: "08:30:00",
+      to: "16:30:00",
+      targetTemperature: 20,
+    },
+    {
+      day: 6, // Saturday
+      from: "10:00:00",
+      to: "14:00:00",
+      targetTemperature: 22,
+    },
+    {
+      day: 7, // Sunday
+      from: "12:00:00",
+      to: "18:00:00",
+      targetTemperature: 24,
+    },
+  ],
+};
+
 // Dummy data representing temperature changes
 const temperatureData = [
   { startTime: "00:00", endTime: "08:00", temp: 15 },
@@ -56,32 +163,42 @@ const updatedTemperatureData = temperatureData.map((data) => ({
 }));
 
 const parseTimeToPercentage = (timestamp) => {
-  if (!timestamp) return 0;
+  let date;
 
-  let hours, minutes, seconds;
-
-  if (timestamp.includes("T")) {
-    // ISO 8601 timestamp
-    const date = new Date(timestamp);
-    if (isNaN(date.getTime())) return 0;
-
-    hours = date.getUTCHours();
-    minutes = date.getUTCMinutes();
-    seconds = date.getUTCSeconds();
-  } else {
-    // Time-only string (e.g., "23:59")
-    const [hourStr, minuteStr, secondStr = "0"] = timestamp.split(":");
-    hours = parseInt(hourStr, 10);
-    minutes = parseInt(minuteStr, 10);
-    seconds = parseInt(secondStr, 10);
+  // Try to parse the timestamp directly
+  try {
+    date = new Date(timestamp);
+  } catch (e) {
+    // Fallback if parsing fails
+    return null;
   }
 
-  if (isNaN(hours) || isNaN(minutes) || isNaN(seconds)) return 0;
+  // Check if the input is a time-only string
+  if (!isNaN(date.getTime())) {
+    // ISO 8601 timestamp or valid Date string
+    const hours = date.getUTCHours();
+    const minutes = date.getUTCMinutes();
+    const seconds = date.getUTCSeconds();
+    const totalMinutes = hours * 60 + minutes;
+    const totalSeconds = totalMinutes * 60 + seconds;
+    const percentage = (totalSeconds / 86400) * 100;
 
-  const totalSeconds = hours * 3600 + minutes * 60 + seconds;
-  const percentage = (totalSeconds / 86400) * 100;
+    return percentage;
+  } else {
+    // Handle time-only string format (e.g., "23:59:00")
+    const [timeString] = timestamp.split("T"); // Remove date part if present
+    const [hours, minutes, seconds = "0"] = timeString.split(":").map(Number);
 
-  return Math.min(Math.max(percentage, 0), 100); // Ensure within 0-100%
+    if (isNaN(hours) || isNaN(minutes)) {
+      return null;
+    }
+
+    const totalMinutes = hours * 60 + minutes;
+    const totalSeconds = totalMinutes * 60 + seconds;
+    const percentage = (totalSeconds / 86400) * 100;
+
+    return percentage;
+  }
 };
 
 const TemperatureSchedule = ({
@@ -147,41 +264,27 @@ const TemperatureSchedule = ({
     });
   };
 
+  const [type, setType] = useState("Resident");
   const [openModal, setOpenModal] = useState(false);
   const [openEditModal, setOpenEditModal] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [selectedRoomSchedId, setSelectedRoomSchedId] = useState(null);
   const [selectedRoomAlgo, setSelectedRoomAlgo] = useState(false);
-  const [RoomsDetail, setRoomsDetail] = useState([
-    {
-      id: "room-1",
-      name: "Living Room",
-      roomTemperature: 22.5,
-      windowOpen: true,
-      heatingSchedule: {
-        id: "schedule-1",
-        currentTargetTemperature: {
-          targetTemperature: 22,
-          createdAt: "2025-01-06T12:00:00Z",
-        },
-        currentDay: [
-          { from: "00:00", to: "14:00", targetTemperature: 22 },
-          { from: "14:00", to: "20:00", targetTemperature: 12 },
-          { from: "20:00", to: "24:00", targetTemperature: 32 },
-        ],
-      },
-    },
-  ]);
+  const [RoomsDetail, setRoomsDetail] = useState([]);
+  const [locationDetails, setLocationDetails] = useState([]);
   const [scheduleDetails, setscheduleDetails] = useState([]);
   const [roomName, setroomName] = useState("");
   const isFirstRender = useRef(true);
   const isFirstRender2 = useRef(true);
-  const [roomId, setRoomId] = useState("");
 
   const handleOpenModal = (roomSchedId) => {
     setSelectedRoomSchedId(roomSchedId);
     setOpenModal(!openModal);
   };
+  // useEffect(() => {
+  // 	console.log("temp schdeuled rendere");
+  // }, []);
+
   const handleOpenEditModal = (room) => {
     setOpenEditModal(!openEditModal);
     setSelectedRoom(room);
@@ -199,10 +302,15 @@ const TemperatureSchedule = ({
       return null;
     }
   };
-
+  // const [shouldFetch, setShouldFetch] = useState(false);
   const [fetch1, setfetch1] = useState(false);
   const updateReplacedF = async () => {
+    // check = update;
+    // await getFloorDetails(floorId);
     setfetch1(true);
+    // fetchHeatingScheduleForRoom();
+    // await fetchSchedules();
+    // console.log("call 1");
   };
 
   useEffect(() => {
@@ -213,6 +321,8 @@ const TemperatureSchedule = ({
         getFloorDetails(floorId);
         fetchSchedules();
         setfetch1(false);
+
+        // console.log("call 2");
       }
     }
   }, [fetch1]);
@@ -250,33 +360,22 @@ const TemperatureSchedule = ({
         return room;
       })
     );
+    // console.log(updatedRooms, "up");
     setscheduleDetails(updatedRooms); // Update schedule details
   };
 
-  // const getFloorDetails = async (id) => {
-  //   try {
-  //     const resp = await axios.get(
-  //       ApiUrls.SMARTHEATING_OPERATIONALVIEW.DETAILS(id)
-  //     );
-  //     const data = await resp.data;
-  //     const pdata = processRoomsData(data);
-  //     setRoomsDetail(pdata); // This will automatically trigger fetchSchedules via useEffect
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
-
-  const getFloorDetails = (id) => {
-    axios
-      .get(ApiUrls.SMARTHEATING_OPERATIONALVIEW.DETAILS(id))
-      .then((resp) => {
-        const data = resp.data;
-        const pdata = processRoomsData(data);
-        setRoomsDetail(pdata); // This will automatically trigger fetchSchedules via useEffect
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+  const getFloorDetails = async (id) => {
+    try {
+      const resp = await axios.get(
+        ApiUrls.SMARTHEATING_OPERATIONALVIEW.DETAILS(id)
+      );
+      const data = await resp.data;
+      const pdata = processRoomsData(data);
+      // console.log(pdata);
+      setRoomsDetail(pdata); // This will automatically trigger fetchSchedules via useEffect
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   useEffect(() => {
@@ -287,6 +386,8 @@ const TemperatureSchedule = ({
         getFloorDetails(floorId);
         fetchSchedules();
         setaccordianOpened(false);
+
+        // console.log("call 4");
       }
     }
   }, [accordianOpened]);
@@ -298,49 +399,20 @@ const TemperatureSchedule = ({
       if (accordianOpened2 === true) {
         fetchSchedules();
         setaccordianOpened2(false);
+        // console.log("called twice");
+        // console.log("call 4");
       }
     }
+    // fetchSchedules();
+    // setaccordianOpened2(false);
+    // console.log("called twice");
+    // console.log("call1", accordianOpened, accordianOpened2);
   }, [accordianOpened2]);
 
   const formatTime = (time) => {
     // Extract hours and minutes from the time string
     const [hours, minutes] = time.split(":");
     return `${hours}:${minutes}`;
-  };
-
-  const calculateDynamicRem = (timestamp) => {
-    let date;
-
-    // Try to parse the timestamp
-    try {
-      date = new Date(timestamp);
-    } catch (e) {
-      return "0rem"; // Fallback to 0 rem if parsing fails
-    }
-
-    // Check if the input is a valid date or time-only string
-    if (!isNaN(date.getTime())) {
-      // ISO 8601 timestamp or valid Date string
-      const hours = date.getUTCHours();
-      const minutes = date.getUTCMinutes();
-      const seconds = date.getUTCSeconds();
-      const totalHours = hours + minutes / 60 + seconds / 3600;
-      const maxRem = 5; // Define maximum rem value for 24 hours
-      const remValue = (totalHours / 24) * maxRem;
-      return `${remValue}rem`;
-    } else {
-      // Handle time-only string format (e.g., "23:59:00")
-      const [timeString] = timestamp.split("T"); // Remove date part if present
-      const [hours, minutes, seconds = "0"] = timeString.split(":").map(Number);
-
-      if (isNaN(hours) || isNaN(minutes)) {
-        return "0rem";
-      }
-      const totalHours = hours + minutes / 60 + seconds / 3600;
-      const maxRem = 1.975; // Define maximum rem value for 24 hours
-      const remValue = (totalHours / 24) * maxRem;
-      return `${remValue}rem`;
-    }
   };
 
   return (
@@ -353,53 +425,100 @@ const TemperatureSchedule = ({
           >
             <div className="flex flex-wrap items-center justify-between gap-2 mb-12 text-gray-900 md:gap-4 2xl:mb-10">
               <div className="flex flex-wrap items-center gap-2 w-full 2xl:w-[22%]  2xl:mr-0 ">
-                <span className="text-sm font-bold block w-full overflow-hidden text-ellipsis whitespace-nowrap">
-                  {room.name && room.name.length > 40
-                    ? room.name.slice(0, 40) + "..."
-                    : room.name}
-                </span>
+                <Tooltip content={room.name} style="light">
+                  <span className="text-sm font-bold block w-full overflow-hidden text-ellipsis whitespace-nowrap">
+                    {room.name && room.name.length > 40
+                      ? room.name.slice(0, 40) + "..."
+                      : room.name}
+                  </span>
+                </Tooltip>
+                {/* <Tooltip content={room.tag} style="light">
+									<span
+										className={`text-xs font-normal py-0.5 px-2.5 ml-1 ${handleTypeColor(
+											type,
+										)} rounded-full overflow-hidden text-ellipsis whitespace-nowrap`}
+									>
+										{room.tag && room.tag.length > 15
+											? `${room.tag.slice(0, 12)}...`
+											: room.tag}
+									</span>
+								</Tooltip> */}
               </div>
               <div className=" flex  items-center gap-4 justify-start w-auto 2xl:w-[25%] 2xl:gap-10">
-                <div className="flex items-center gap-2 text-xl ">
-                  <img src={thermometer} alt="Thermometer" />
-                  <p className="text-sm w-[80px]">
-                    {room.roomTemperature
-                      ? `${room.roomTemperature.toFixed(1)}°C`
-                      : "nicht vorhanden"}
-                  </p>
-                </div>
+                <Tooltip
+                  className={`px-2 py-1.5 text-center max-w-xs`}
+                  content={`Raumtemperatur: ${
+                    room.roomTemperature ? `${room.roomTemperature}°C` : "Unset"
+                  }`}
+                  style="light"
+                >
+                  <div className="flex items-center gap-2 text-xl ">
+                    <img src={thermometer} alt="Thermometer" />
+                    <p className="text-sm w-[80px]">
+                      {room.roomTemperature
+                        ? `${room.roomTemperature.toFixed(1)}°C`
+                        : "nicht vorhanden"}
+                    </p>
+                  </div>
+                </Tooltip>
 
-                <div className="flex items-center w-full gap-2 text-xl ">
-                  {/*<img src={windowicon} alt="Window" />
+                <Tooltip
+                  className={`px-2 py-1.5 text-center max-w-xs`}
+                  content={`Fenster ist ${room.windowOpen ? "offen" : "zu"}`}
+                  style="light"
+                >
+                  <div className="flex items-center w-full gap-2 text-xl ">
+                    <img src={windowicon} alt="Window" />
                     <p className="text-sm w-[45px]">
                       {room.windowOpen ? "offen" : "zu"}
-                    </p>*/}
-                </div>
+                    </p>
+                  </div>
+                </Tooltip>
+
+                {/* <Tooltip
+									className={`px-2 py-1.5 text-center max-w-xs`}
+									content={`Algorithmus ist ${room.algorithm ? "an" : "aus"}`}
+									style="light"
+								>
+									<div className="flex items-center w-full gap-2 text-xl ">
+										<img src={algo} alt="Algorithm" />
+										<p className="text-sm w-[45px]">
+											{room.algorithm ? "An" : "Aus"}
+										</p>
+									</div>
+								</Tooltip> */}
               </div>
 
               <div className="w-auto 2xl:w-[30%] flex justify-end">
-                <p
-                  className="text-sm text-primary"
-                  style={{
-                    overflow: "hidden",
-                    whiteSpace: "nowrap",
-                    textOverflow: "ellipsis",
-                  }}
+                <Tooltip
+                  content={
+                    scheduleDetails[index]?.schedule?.templateName || "None"
+                  }
+                  style="light"
                 >
-                  {scheduleDetails[index]?.schedule?.templateName
-                    ? scheduleDetails[index].schedule.templateName.length > 50
-                      ? `${scheduleDetails[index].schedule.templateName.slice(
-                          0,
-                          50
-                        )}...`
-                      : scheduleDetails[index].schedule.templateName
-                    : "None"}
-                </p>
+                  <p
+                    className="text-sm text-primary"
+                    style={{
+                      overflow: "hidden",
+                      whiteSpace: "nowrap",
+                      textOverflow: "ellipsis",
+                    }}
+                  >
+                    {scheduleDetails[index]?.schedule?.templateName
+                      ? scheduleDetails[index].schedule.templateName.length > 50
+                        ? `${scheduleDetails[index].schedule.templateName.slice(
+                            0,
+                            50
+                          )}...`
+                        : scheduleDetails[index].schedule.templateName
+                      : "None"}
+                  </p>
+                </Tooltip>
               </div>
 
               <div className="flex items-center justify-end gap-4 text-sm xl:w-[20%] 2xl:w-[15%]">
                 <Button
-                  // disabled={room.heatingSchedule === null}
+                  disabled={room.heatingSchedule === null}
                   onClick={() => {
                     handleOpenModal(
                       room.heatingSchedule ? room.heatingSchedule.id : null
@@ -407,44 +526,51 @@ const TemperatureSchedule = ({
                     setSelectedRoomAlgo(
                       room.algorithm && room.algorithm ? true : false
                     );
-                    setRoomId(room.id);
                     setroomName(room.name);
                     setSelectedRoom(room);
                   }}
-                  className={`hover:!bg-transparent hover:opacity-80 border-none text-primary bg-transparent "text-primary"
-									
-									 pr-2 py-0 [&>*]:p-0 focus:ring-transparent`}
+                  className={`hover:!bg-transparent hover:opacity-80 border-none text-primary bg-transparent ${
+                    room.heatingSchedule !== null && room.heatingSchedule.id
+                      ? "text-primary"
+                      : "text-gray-500"
+                  } pr-2 py-0 [&>*]:p-0 focus:ring-transparent`}
                 >
-                  Details öffnen
+                  Heizplan ansehen
                 </Button>
 
-                <div>
-                  <svg
-                    onClick={() => {
-                      if (room.heatingSchedule !== null)
-                        handleOpenEditModal(room ? room : null);
-                    }}
-                    className={`cursor-pointer w-6 h-6  dark:text-white ${
-                      room.heatingSchedule !== null && room.heatingSchedule.id
-                        ? "text-gray-800"
-                        : "text-gray-500"
-                    }`}
-                    aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="m14.304 4.844 2.852 2.852M7 7H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-4.5m2.409-9.91a2.017 2.017 0 0 1 0 2.853l-6.844 6.844L8 14l.713-3.565 6.844-6.844a2.015 2.015 0 0 1 2.852 0Z"
-                    />
-                  </svg>
-                </div>
+                <Tooltip
+                  className={`px-2 py-1.5 text-center whitespace-nowrap max-w-xs`}
+                  content={`Heizplan bearbeiten`}
+                  style="light"
+                >
+                  <div>
+                    <svg
+                      onClick={() => {
+                        if (room.heatingSchedule !== null)
+                          handleOpenEditModal(room ? room : null);
+                      }}
+                      className={`cursor-pointer w-6 h-6  dark:text-white ${
+                        room.heatingSchedule !== null && room.heatingSchedule.id
+                          ? "text-gray-800"
+                          : "text-gray-500"
+                      }`}
+                      aria-hidden="true"
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke="currentColor"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="m14.304 4.844 2.852 2.852M7 7H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-4.5m2.409-9.91a2.017 2.017 0 0 1 0 2.853l-6.844 6.844L8 14l.713-3.565 6.844-6.844a2.015 2.015 0 0 1 2.852 0Z"
+                      />
+                    </svg>
+                  </div>
+                </Tooltip>
               </div>
             </div>
 
@@ -460,22 +586,26 @@ const TemperatureSchedule = ({
                         style={{
                           left: `calc(${parseTimeToPercentage(
                             change.createdAt
-                          )}% - 0.35rem)`,
+                          )}% + 0.215rem)`,
                           top: `-9px`,
                           zIndex: "1", // Ensure dots are above the temperature line
                         }}
                       >
-                        <div
-                          key={`dot-${index}`}
-                          className="w-2 h-2 bg-gray-400 rounded-full"
-                        />
-                        {console.log(change.createdAt, "change.createdAt")}
+                        <Tooltip
+                          className={`px-2 py-1.5 text-center w-full min-w-[170px] max-w-xs`}
+                          content={`Raumnutzer änderte Soll-Temperatur auf ${change.targetTemperature}°C`}
+                          style="light"
+                        >
+                          <div
+                            key={`dot-${index}`}
+                            className="w-2 h-2 bg-gray-400 rounded-full"
+                          />
+                        </Tooltip>
                       </div>
                     ))}
                   </div>
                 </div>
               )}
-
             {room.heatingSchedule && room.heatingSchedule.currentDay ? (
               <div className="relative w-full px-4">
                 {/* marker */}
@@ -486,26 +616,30 @@ const TemperatureSchedule = ({
                     style={{
                       left: `calc(${parseTimeToPercentage(
                         room.heatingSchedule.currentTargetTemperature.createdAt
-                      )}% - ${calculateDynamicRem(
-                        room.heatingSchedule.currentTargetTemperature.createdAt
-                      )})`,
+                      )}% - 0.575rem)`,
                       top: `-28px`,
                       zIndex: "1", // Ensure dots are above the temperature line
                     }}
                   >
-                    <div className="flex flex-col items-center justify-center">
-                      <div
-                        key={`dot-${1}`}
-                        className="py-0.5 px-1 text-[8px] text-gray-900 bg-transparent border border-red-500 rounded-full"
-                      >
-                        {
-                          room.heatingSchedule.currentTargetTemperature
-                            .targetTemperature
-                        }
-                        °C
+                    <Tooltip
+                      className={`px-2 py-1.5 text-center w-full min-w-[170px] max-w-96`}
+                      content={`Soll-Temperatur: ${room.heatingSchedule.currentTargetTemperature.targetTemperature}°C`}
+                      style="light"
+                    >
+                      <div className="flex flex-col items-center justify-center">
+                        <div
+                          key={`dot-${1}`}
+                          className="py-0.5 px-1 text-[8px] text-gray-900 bg-transparent border border-red-500 rounded-full"
+                        >
+                          {
+                            room.heatingSchedule.currentTargetTemperature
+                              .targetTemperature
+                          }
+                          °C
+                        </div>
+                        <div className="w-[1px] h-[26px] bg-red-500"></div>
                       </div>
-                      <div className="w-[1px] h-[26px] bg-red-500"></div>
-                    </div>
+                    </Tooltip>
                   </div>
                 )}
 
@@ -535,10 +669,15 @@ const TemperatureSchedule = ({
                               parseTimeToPercentage(element.to) -
                               parseTimeToPercentage(element.from)
                             }% - 0.15rem)`,
+                            // marginLeft: index === 0 ? "0" : "0.1rem",
+                            // marginRight:
+                            // 	index === array.length - 1 ? "0" : "0.45rem",
                           }}
-                        ></div>
+                        >
+                          {/* {console.log(room.heatingSchedule.currentDay)} */}
+                        </div>
                         <div
-                          className=" absolute top-[-4px] flex flex-col text-xs text-gray-500 items-end ml-[2px]"
+                          className=" absolute top-[-4px] flex flex-col text-sm text-gray-500 items-end ml-[2px]"
                           style={{
                             left: `${parseTimeToPercentage(element.from)}%  `,
                             width: `calc(${
@@ -558,37 +697,17 @@ const TemperatureSchedule = ({
                               position: "absolute",
                               top: "20px", // Adjust vertical spacing below the separator
                               left: `${
-                                index === 0 &&
                                 parseTimeToPercentage(element.to) -
                                   parseTimeToPercentage(element.from) <
-                                  5
-                                  ? "-22px" // For index 0 and time difference less than 5
-                                  : index === 0 &&
-                                    parseTimeToPercentage(element.to) -
-                                      parseTimeToPercentage(element.from) >=
-                                      5
-                                  ? "-22px" // For index 0 and time difference greater than or equal to 5
-                                  : index > 0 &&
-                                    parseTimeToPercentage(element.to) -
-                                      parseTimeToPercentage(element.from) <
-                                      5
-                                  ? "-5px" // For other indexes and time difference less than 5
-                                  : index > 0 &&
-                                    parseTimeToPercentage(element.to) -
-                                      parseTimeToPercentage(element.from) >=
-                                      5
-                                  ? "-4px" // For other indexes and time difference greater than or equal to 5
-                                  : "0px" // Fallback in case none of the above conditions are met
+                                5
+                                  ? "-10px"
+                                  : "0px"
                               }`, // Align with the left edge of the separator
                               transform: index === 0 ? "" : "translateX(-50%)",
                               whiteSpace: "nowrap", // Prevent text wrapping
                             }}
                           >
-                            {/* Display "Heute" only if index is 0 and time difference is not less than 5 */}
-                            {/* {index === 0 &&
-                              parseTimeToPercentage(element.to) - parseTimeToPercentage(element.from) >= 5
-                              ? "Heute"
-                              : ""} */}
+                            {index === 0 ? "Heute " : ""}
                             {formatTime(element.from)}
                           </span>
                           {index ===
@@ -597,13 +716,13 @@ const TemperatureSchedule = ({
                               style={{
                                 position: "absolute",
                                 top: "20px", // Adjust vertical spacing below the separator
-                                right: "-16px", // Align with the left edge of the separator
-                                // transform:
-                                //   index === 0 ? "" : "translateX(-50%)",
+                                right: "-35px", // Align with the left edge of the separator
+                                transform:
+                                  index === 0 ? "" : "translateX(-50%)",
                                 whiteSpace: "nowrap", // Prevent text wrapping
                               }}
                             >
-                              {/* {index === 0 ? "Heute " : ""} */}
+                              {index === 0 ? "Heute " : ""}
                               {formatTime(element.to)}
                             </span>
                           )}
@@ -651,7 +770,7 @@ const TemperatureSchedule = ({
         <p className="text-center text-gray-600">Keine Räume</p>
       )}
 
-      {roomId && (
+      {selectedRoomSchedId && (
         <ViewRoomScheduleModal
           openModal={openModal}
           handleOpenModal={handleOpenModal}

@@ -40,7 +40,7 @@ const OverviewCard = ({ formData }) => {
 
   return (
     <>
-      <div className="w-full relative flex flex-col border-gray-200 border-[1px] bg-white rounded-[8px] px-4 py-4 justify-center items-center">
+      <div className="w-full relative flex flex-col border-gray-200 border-[1px] bg-white rounded-[8px] px-4 py-4 justify-center items-center ">
         <div className="flex items-start w-full gap-4">
           <div className="w-[55px] h-[90px] rounded-md">
             <img

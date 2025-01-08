@@ -25,7 +25,7 @@ const LayoutContent = () => {
     return <Loader />;
   }
 
-  return isAuthenticated ? (
+  return (
     <div className="w-full flex justify-start items-start min-h-screen relative">
       <div className=" fixed top-0 left-0 bottom-0 z-20">
         <ExampleSidebar />
@@ -34,8 +34,6 @@ const LayoutContent = () => {
         <Outlet />
       </MainContent>
     </div>
-  ) : (
-    <Navigate to={NAVIGATION_PATH.authLayout} />
   );
 };
 

@@ -15,8 +15,82 @@ import DateFilter from "./dateFilter/DateFilter";
 import "../../../../index.css";
 import formatTimestamp from "../../../../utils/formatTimeStamp";
 import { CiCircleRemove } from "react-icons/ci";
-import SkeletonTable from "./SkeltonTable";
-// import Bowser from 'bowser';
+
+const placeholderData = [
+  {
+    id: "123",
+    roomName: "Room A",
+    building_floor_string: "Building 1 - Floor 2",
+    createdAt: "2025-01-01T12:00:00Z",
+    eventTypeLevel: "Information",
+    eventTypeMessage: "This is a placeholder event message.",
+    message: "This is a placeholder event message for testing.",
+  },
+  {
+    id: "124",
+    roomName: "Room B",
+    building_floor_string: "Building 2 - Floor 3",
+    createdAt: "2025-01-02T12:00:00Z",
+    eventTypeLevel: "Warning",
+    eventTypeMessage: "Warning placeholder event message.",
+    message: "This is another placeholder event message for testing.",
+  },
+  {
+    id: "123",
+    roomName: "Room A",
+    building_floor_string: "Building 1 - Floor 2",
+    createdAt: "2025-01-01T12:00:00Z",
+    eventTypeLevel: "Information",
+    eventTypeMessage: "This is a placeholder event message.",
+    message: "This is a placeholder event message for testing.",
+  },
+  {
+    id: "124",
+    roomName: "Room B",
+    building_floor_string: "Building 2 - Floor 3",
+    createdAt: "2025-01-02T12:00:00Z",
+    eventTypeLevel: "Warning",
+    eventTypeMessage: "Warning placeholder event message.",
+    message: "This is another placeholder event message for testing.",
+  },
+  {
+    id: "123",
+    roomName: "Room A",
+    building_floor_string: "Building 1 - Floor 2",
+    createdAt: "2025-01-01T12:00:00Z",
+    eventTypeLevel: "Information",
+    eventTypeMessage: "This is a placeholder event message.",
+    message: "This is a placeholder event message for testing.",
+  },
+  {
+    id: "124",
+    roomName: "Room B",
+    building_floor_string: "Building 2 - Floor 3",
+    createdAt: "2025-01-02T12:00:00Z",
+    eventTypeLevel: "Warning",
+    eventTypeMessage: "Warning placeholder event message.",
+    message: "This is another placeholder event message for testing.",
+  },
+  {
+    id: "123",
+    roomName: "Room A",
+    building_floor_string: "Building 1 - Floor 2",
+    createdAt: "2025-01-01T12:00:00Z",
+    eventTypeLevel: "Information",
+    eventTypeMessage: "This is a placeholder event message.",
+    message: "This is a placeholder event message for testing.",
+  },
+  {
+    id: "124",
+    roomName: "Room B",
+    building_floor_string: "Building 2 - Floor 3",
+    createdAt: "2025-01-02T12:00:00Z",
+    eventTypeLevel: "Warning",
+    eventTypeMessage: "Warning placeholder event message.",
+    message: "This is another placeholder event message for testing.",
+  },
+  // Add more placeholder items as needed
+];
 
 const EventLogsTable = () => {
   const [selectedEventFilters, setSelectedEventFilters] = useState(null);
@@ -677,12 +751,9 @@ const EventLogsTable = () => {
               </th>
             </tr>
           </thead>
-
-          {delayedLoading && <SkeletonTable />}
-
-          {tableData.length > 0 && !delayedLoading && (
-            <tbody className="">
-              {tableData.map((item, index) => (
+          {placeholderData.length > 0 && (
+            <tbody>
+              {placeholderData.map((item, index) => (
                 <tr
                   key={index}
                   className="text-sm bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
@@ -738,10 +809,65 @@ const EventLogsTable = () => {
                 </tr>
               ))}
             </tbody>
+            // <tbody>
+            //   {placeholderData.map((item, index) => (
+            //     <tr
+            //       key={index}
+            //       className="text-sm bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
+            //     >
+            //       <td className="px-4 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white w-[9%]">
+            //         {item.id ? item.id : "-"}
+            //       </td>
+            //       <td className="px-4 py-4 font-medium text-gray-900 break-words dark:text-white w-[15%]">
+            //         {item.roomName ? item.roomName : "-"}
+            //       </td>
+            //       <td className="px-4 py-4 w-[16%]">
+            //         {item.building_floor_string ? (
+            //           <>
+            //             {item.building_floor_string.split(" - ")[0] + " - "}
+            //             <br />
+            //             {item.building_floor_string.split(" - ")[1]}
+            //           </>
+            //         ) : (
+            //           "-"
+            //         )}
+            //       </td>
+            //       <td className="px-4 py-4 w-[13%]">
+            //         {item.createdAt ? formatTimestamp(item.createdAt) : "-"}
+            //       </td>
+            //       <td className="px-4 py-4 w-[15%]">
+            //         <div className="flex items-center gap-x-2">
+            //           <Tooltip
+            //             content={getEventTypeText(item.eventTypeLevel)}
+            //             style="light"
+            //           >
+            //             {item.eventTypeLevel === "Information" ? (
+            //               <FaCircleInfo />
+            //             ) : item.eventTypeLevel === "Warning" ? (
+            //               <RiErrorWarningFill className="text-yellow-500" />
+            //             ) : item.eventTypeLevel === "Behoben" ? (
+            //               <FaCircleCheck className="text-green-600" />
+            //             ) : (
+            //               <IoIosWarning className="text-red-700" />
+            //             )}
+            //           </Tooltip>
+            //           <span className="text-sm">
+            //             {item.eventTypeMessage ? item.eventTypeMessage : "-"}
+            //           </span>
+            //         </div>
+            //       </td>
+            //       <td className="px-4 py-4 w-[26%]">
+            //         <Tooltip content={item.message} style="light">
+            //           {item.message ? `${item.message}` : "-"}
+            //         </Tooltip>
+            //       </td>
+            //     </tr>
+            //   ))}
+            // </tbody>
           )}
         </table>
 
-        {tableData.length === 0 && !loading && (
+        {tableData.length === 0 && placeholderData.length === 0 && (
           <>
             <div className="w-full bg-slate-100 flex flex-col justify-center items-center">
               <p className="w-full text-center italic py-2 font-semibold">

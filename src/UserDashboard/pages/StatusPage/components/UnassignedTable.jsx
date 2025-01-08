@@ -10,8 +10,49 @@ import { errorMessages as errors } from "../../../../globals/errorMessages"; // 
 import { CiCircleRemove } from "react-icons/ci";
 import { useToast } from "../../OperationalOverview/components/ToastContext";
 import AssignProgramModal from "./AssignProgramModal";
-import SkeletonTable from "./SkeltonTable";
-import UnassignedSkeletonTable from "./SkeltonUnassigned";
+
+const placeholderData = [
+  {
+    locationId: "1",
+    name: "Room 101",
+    building_floor_string: "Building A - Floor 1",
+  },
+  {
+    locationId: "2",
+    name: "Room 102",
+    building_floor_string: "Building A - Floor 1",
+  },
+  {
+    locationId: "3",
+    name: "Room 201",
+    building_floor_string: "Building B - Floor 2",
+  },
+  {
+    locationId: "4",
+    name: "Room 202",
+    building_floor_string: "Building B - Floor 2",
+  },
+  {
+    locationId: "5",
+    name: "Room 301",
+    building_floor_string: "Building C - Floor 3",
+  },
+  {
+    locationId: "6",
+    name: "Room 302",
+    building_floor_string: "Building C - Floor 3",
+  },
+  {
+    locationId: "7",
+    name: "Room 401",
+    building_floor_string: "Building D - Floor 4",
+  },
+  {
+    locationId: "8",
+    name: "Room 402",
+    building_floor_string: "Building D - Floor 4",
+  },
+];
 
 const UnassignedTable = ({ assignUpdate }) => {
   const [selectedEventFilters, setSelectedEventFilters] = useState(null);
@@ -109,31 +150,34 @@ const UnassignedTable = ({ assignUpdate }) => {
   //   if (filtersSelected === false) getAllLocations();
   // }, [filtersSelected]);
 
-  const getAllLocations = () => {
-    axios
-      .get(ApiUrls.SMARTHEATING_LOCATIONS.LIST)
-      .then((response) => {
-        const transformedData = transformData(response.data);
-        setFilteredLocations(transformedData);
-        setLocationsData(transformedData);
+  // const getAllLocations = () => {
+  //   axios
+  //     .get(ApiUrls.SMARTHEATING_LOCATIONS.LIST)
+  //     .then((response) => {
+  //       const transformedData = transformData(response.data);
+  //       setFilteredLocations(transformedData);
+  //       setLocationsData(transformedData);
 
-        const extractedFloors = transformedData
-          .map((location) => location.children)
-          .flat();
+  //       const extractedFloors = transformedData
+  //         .map((location) => location.children)
+  //         .flat();
 
-        // Update the floors state with the extracted children
-        setFloors(extractedFloors);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
+  //       // Update the floors state with the extracted children
+  //       setFloors(extractedFloors);
+  //     })
+  //     .catch((error) => {
+  //       console.log(error);
+  //     });
+  // };
 
-  useEffect(() => {
-    if (filtersSelected === false) getAllLocations();
-  }, [filtersSelected]);
+  // useEffect(() => {
+  //   if (filtersSelected === false) getAllLocations();
+  // }, [filtersSelected]);
 
-  const [tableData, setTableData] = useState([]);
+  const [tableData, setTableData] = useState(placeholderData);
+  // const [selectedFilter, setSelectedFilter] = useState("Last Year");
+  // const [selectedEvent, setSelectedEvent] = useState("All events");
+
   const [currentPage, setCurrentPage] = useState(1);
   const [totalRows, setTotalRows] = useState(0);
   const [selectedKeys, setSelectedKeys] = useState({});
@@ -459,7 +503,9 @@ const UnassignedTable = ({ assignUpdate }) => {
   return (
     <div className=" flex flex-col gap-4 w-full">
       <div className="flex flex-col justify-center items-start w-full">
-        <h1 className=" font-[500] text-lg text-gray-900">Räume ohne Heizplan</h1>
+        <h1 className=" font-[500] text-lg text-gray-900">
+          Räume ohne Heizplan
+        </h1>
       </div>
       <div className="relative w-full overflow-x-auto overflow-y-hidden bg-white shadow-md sm:rounded-lg">
         <div className="flex flex-column my-2 bg-transparent mx-2 sm:flex-row flex-wrap space-y-4 sm:space-y-0 items-center justify-between">
@@ -557,8 +603,8 @@ const UnassignedTable = ({ assignUpdate }) => {
               </th>
             </tr>
           </thead>
-          {delayedLoading && <UnassignedSkeletonTable />}
-          {tableData.length > 0 && !delayedLoading && (
+          {/* {delayedLoading && <UnassignedSkeletonTable />} */}
+          {tableData.length > 0 && (
             <tbody>
               {tableData.length > 0 &&
                 tableData.map((item, index) => (
