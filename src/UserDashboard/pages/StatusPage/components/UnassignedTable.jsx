@@ -604,9 +604,9 @@ const UnassignedTable = ({ assignUpdate }) => {
             </tr>
           </thead>
           {/* {delayedLoading && <UnassignedSkeletonTable />} */}
-          {tableData.length > 0 && (
+          {tableData?.length > 0 && (
             <tbody>
-              {tableData.length > 0 &&
+              {tableData?.length > 0 &&
                 tableData.map((item, index) => (
                   <tr
                     key={index}
@@ -642,7 +642,7 @@ const UnassignedTable = ({ assignUpdate }) => {
           )}
         </table>
 
-        {tableData.length === 0 && !loading && (
+        {tableData?.length === 0 && !loading && (
           <>
             <div className="w-full bg-slate-100 max-w-[1600px] flex flex-col justify-center items-center">
               <p className="w-full text-center italic py-2 font-semibold">

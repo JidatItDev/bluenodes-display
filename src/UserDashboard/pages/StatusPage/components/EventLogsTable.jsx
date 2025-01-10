@@ -867,7 +867,7 @@ const EventLogsTable = () => {
           )}
         </table>
 
-        {tableData.length === 0 && placeholderData.length === 0 && (
+        {tableData?.length === 0 && placeholderData.length === 0 && (
           <>
             <div className="w-full bg-slate-100 flex flex-col justify-center items-center">
               <p className="w-full text-center italic py-2 font-semibold">
