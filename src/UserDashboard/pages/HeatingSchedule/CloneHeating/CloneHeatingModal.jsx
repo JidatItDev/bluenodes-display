@@ -153,21 +153,8 @@ export function CloneHeatingModal({
   };
 
   const handleNext = () => {
-    if (currentStep === 1) {
-      if (handleSubmit()) {
-        setCurrentStep((prev) => Math.min(prev + 1, 3));
-      }
-    } else if (currentStep === 2) {
-      // Trigger the handleCheck function in the child component
-      if (handleCheckRef.current) {
-        handleCheckRef.current();
-      }
-
-      if (newCheck !== null && !newCheck) {
-        setCurrentStep((prev) => Math.min(prev + 1, 3));
-        setFinalScheduleData(layoutsRef.current);
-      }
-    }
+    console.log("clonning");
+    generateToast("No Data available Right now", false);
   };
 
   const [combinedData, setCombinedData] = useState({

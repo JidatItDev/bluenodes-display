@@ -7,7 +7,6 @@ function GeneralInformation({
   handleChange,
   errorMessages,
   generalErrorMessage,
-  checkName,
 }) {
   return (
     <div className="flex flex-col gap-4 w-full">
@@ -33,7 +32,6 @@ function GeneralInformation({
             <TextInput
               id="programName"
               type="text"
-              onBlur={checkName}
               sizing="sm"
               placeholder="Namen eingeben"
               className="w-[250px]"

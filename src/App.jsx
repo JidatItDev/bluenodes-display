@@ -34,9 +34,9 @@ const App = () => (
             path={NAVIGATION_PATH.deviceManagement}
             element={<DeviceManagementPage />}
           />
-         {STAGE === "dev" && (
+
           <Route path={NAVIGATION_PATH.onboarding} element={<Onboarding />} />
-         )}
+
           <Route
             path="*"
             element={<Navigate to={NAVIGATION_PATH.statuspage} />}

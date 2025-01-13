@@ -145,11 +145,7 @@ export function EditHeatingModal({
   };
 
   const handleNext = () => {
-    if (currentStep === 1) {
-      if (handleSubmit()) {
-        setCurrentStep((prev) => Math.min(prev + 1, 3));
-      }
-    }
+    generateToast("No Data available Right now", false);
   };
 
   const [combinedData, setCombinedData] = useState({

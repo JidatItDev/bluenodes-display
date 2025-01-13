@@ -84,7 +84,7 @@ const EditHeatingProgramModal = ({
   };
 
   useEffect(() => {
-    if (selectedAction === "replace-room" && !selectedProgram) {
+    if (selectedAction === "replace-room") {
       setShowError(true);
     }
   }, [selectedAction, selectedProgram]);
@@ -280,8 +280,6 @@ const EditHeatingProgramModal = ({
       });
   };
   const handleSubmit = () => {
-    handleCheckName();
-
     const returnValue = handleSubmitHelper({
       formData,
       errors,
@@ -322,11 +320,12 @@ const EditHeatingProgramModal = ({
   };
 
   const handleNext = () => {
-    if (currentStep === 1) {
-      if (handleSubmit()) {
-        setCurrentStep((prev) => Math.min(prev + 1, 3));
-      }
-    }
+    generateToast("No Data available Right now", false);
+    // if (currentStep === 1) {
+    //   if (handleSubmit()) {
+    //     setCurrentStep((prev) => Math.min(prev + 1, 3));
+    //   }
+    // }
   };
 
   const [combinedData, setCombinedData] = useState({
@@ -358,7 +357,6 @@ const EditHeatingProgramModal = ({
 
   const handleCreate = async () => {
     try {
-      handleCheckName();
       await handleCreateHelper(
         handleCheckRef,
         newCheck,
@@ -380,7 +378,7 @@ const EditHeatingProgramModal = ({
         updateReplaced,
         handleOpenModal
       );
-      updateReplaced()
+      updateReplaced();
     } catch (error) {
       console.error("Error in handleCreate:", error);
       // Handle the error appropriately, such as showing a toast or modal
@@ -434,34 +432,6 @@ const EditHeatingProgramModal = ({
   //     }));
   //   }
   // };
-  const handleCheckName = () => {
-    axios
-      .get(ApiUrls.SMARTHEATING_HEATINGSCHEDULE.LIST)
-      .then((response) => {
-        const data = response.data;
-        const templateNames =
-          data.length > 0 ? data.map((template) => template.templateName) : [];
-        setCreatedHeatingScheduleNames(templateNames);
-
-        const exists =
-          templateNames && templateNames.includes(formData.programName);
-
-        if (exists) {
-          setErrorMessages((prev) => ({
-            ...prev,
-            programName: errors.ProgramWithNameAlreadyCreated,
-          }));
-        } else {
-          setErrorMessages((prev) => ({
-            ...prev,
-            programName: "",
-          }));
-        }
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
-  };
 
   return (
     <>
@@ -495,7 +465,7 @@ const EditHeatingProgramModal = ({
                       Heizplan für den Raum bearbeiten
                     </Label>
                   </div>
-                  <div
+                  {/* <div
                     onClick={() => handleActionChange("replace-room")}
                     className="flex flex-row items-center justify-center gap-2 cursor-pointer"
                   >
@@ -509,7 +479,7 @@ const EditHeatingProgramModal = ({
                     <Label className="cursor-pointer " htmlFor="replace-room">
                       Anderen Heizplan auswählen
                     </Label>
-                  </div>
+                  </div> */}
                 </div>
 
                 <div className="flex flex-col items-center justify-center w-full mt-3 mb-3">
@@ -527,7 +497,6 @@ const EditHeatingProgramModal = ({
                               handleChange={handleChange}
                               errorMessages={errorMessages}
                               generalErrorMessage={generalErrorMessage} // Pass general error message to Form1
-                              checkName={handleCheckName}
                             />
                           </div>
                         )}

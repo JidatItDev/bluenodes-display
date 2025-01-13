@@ -180,42 +180,34 @@ const ExampleSidebar = () => {
 const BottomMenu = ({ isCollapsed, isHovered }) => {
   const [userDetails, setUserDetails] = useState({});
 
-  const fetchUserDetails = () => {
-    axios
-      .get(ApiUrls.USER.PROFILE)
-      .then((response) => {
-        const data = response.data;
-        setUserDetails(data);
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
-  };
-
   useEffect(() => {
-    fetchUserDetails();
+    // Setting temporary hardcoded data
+    const tempData = {
+      customer: "John Doe",
+      email: "john.doe@example.com",
+    };
+    setUserDetails(tempData);
   }, []);
 
   return (
     <div className="flex flex-col w-full">
-       {STAGE === "dev" && (
-        <CompactGetStartedCard isCollapsed={isCollapsed} isHovered={isHovered} />
-      )}
+      <CompactGetStartedCard isCollapsed={isCollapsed} isHovered={isHovered} />
+
       <div className="h-px bg-gray-200 my-1" />
-      <div className="flex items-center justify-between w-full ">
+      <div className="flex items-center justify-between w-full">
         <div
-          className={classNames(" flex flex-col", {
-            "hidden ": isCollapsed, // Hide button when sidebar is collapsed
-            "!block ": isHovered && isCollapsed, // Hide button when sidebar is collapsed
+          className={classNames("flex flex-col", {
+            hidden: isCollapsed, // Hide button when sidebar is collapsed
+            "!block": isHovered && isCollapsed, // Show button when sidebar is collapsed and hovered
           })}
         >
-          <p className=" font-bold text-[#111928]">{userDetails.customer}</p>
-          <p className=" text-xs text-[#6B7280]">{userDetails.email}</p>
+          <p className="font-semibold text-[#111928]">{userDetails.customer}</p>
+          <p className="text-xs text-[#6B7280]">{userDetails.email}</p>
         </div>
         <div
           className={classNames({
-            "hidden ": isCollapsed, // Hide button when sidebar is collapsed
-            "!block ": isHovered && isCollapsed, // Hide button when sidebar is collapsed
+            hidden: isCollapsed, // Hide button when sidebar is collapsed
+            "!block": isHovered && isCollapsed, // Show button when sidebar is collapsed and hovered
           })}
         >
           <OptionsDropdown />
